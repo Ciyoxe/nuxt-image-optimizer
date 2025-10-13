@@ -14,7 +14,7 @@ export type ImageData = {
 export class ImageFetcher {
     private cacheLock = new CacheLock();
     private fetchCache = new Map<string, ImageData>();
-    private localStorage = useStorage('cached-image-optimizer:local');
+    private localStorage = useStorage('cached-image-optimizer__local');
 
     private addImageToCache(url: string, data: ImageData) {
         this.fetchCache.set(url, data);

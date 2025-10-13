@@ -2,7 +2,7 @@ export type Size = `${number}${'B' | 'KB' | 'MB' | 'GB'}`;
 export type Time = `${number}${'s' | 'm' | 'h' | 'd'}`;
 export type Clamping = `${'<' | '<=' | '>' | '>='}${number}`;
 
-export const getSizeInBytes = (size: Size) => {
+export const getSizeInBytes = (size: string) => {
     const trimmedSize = size.trim();
     switch (true) {
         case trimmedSize.endsWith('B'):
@@ -18,7 +18,7 @@ export const getSizeInBytes = (size: Size) => {
     }
 };
 
-export const getTimeInMilliseconds = (time: Time) => {
+export const getTimeInMilliseconds = (time: string) => {
     const trimmedTime = time.trim();
     switch (true) {
         case trimmedTime.endsWith('s'):
@@ -34,7 +34,7 @@ export const getTimeInMilliseconds = (time: Time) => {
     }
 };
 
-export const matchClamping = (value: number, clamping: Clamping) => {
+export const matchClamping = (value: number, clamping: string) => {
     switch (true) {
         case clamping.startsWith('<'):
             return value < Number(clamping.slice(1));

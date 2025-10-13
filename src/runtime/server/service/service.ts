@@ -2,12 +2,11 @@ import { useStorage } from 'nitropack/runtime';
 import { CacheLock } from './cache-lock';
 import { AsyncQueue } from './async-queue';
 import { ImageOptimizer, type ImageSettings } from './image-optimizer';
-import { ImageFetcher } from './image-fetcher';
-import type { ImageData } from './image-fetcher';
+import { ImageFetcher, type ImageData } from './image-fetcher';
 
 type Config = {
-    maxSize: number;
-    autoUpdateTimeout: number;
+    maxCacheSize: number;
+    autoRefreshInterval: number;
     mainQueueSize: number;
     mainQueueTimeout: number;
     backgroundQueueSize: number;
@@ -39,7 +38,7 @@ export class Service {
     // task for updating existing images in background, low prior
     private backgroundTasksQueue: AsyncQueue;
 
-    private cacheDataStorage = useStorage<Buffer>('cached-image-optimizer:cache');
+    private cacheDataStorage = useStorage<Buffer>('cached-image-optimizer__cache');
     private cacheIndex = new Map<string, CacheIndexItem>();
     private cacheSize = 0;
 
@@ -78,7 +77,7 @@ export class Service {
         const time = Date.now();
 
         for (const [k, v] of this.cacheIndex.entries()) {
-            if (time - v.lastUpdated > this.config.autoUpdateTimeout && !this.backgroundTasksQueue.hasTaskInQueue(k)) {
+            if (time - v.lastUpdated > this.config.autoRefreshInterval && !this.backgroundTasksQueue.hasTaskInQueue(k)) {
                 this.backgroundTasksQueue.add(k, async () => {
                     const image = await this.imgFetcher.fetchImage(v.original.url);
                     if (v.original.hash !== image.hash) {
@@ -133,12 +132,12 @@ export class Service {
 
     private async addImageToCache(key: string, settings: ImageSettings, original: ImageData, optimizedData: Buffer) {
         const size = optimizedData.byteLength;
-        if (size > this.config.maxSize) {
-            console.warn(`Image is too large to fit in cache ${size} > ${this.config.maxSize}, ${key}`);
+        if (size > this.config.maxCacheSize) {
+            console.warn(`Image is too large to fit in cache ${size} > ${this.config.maxCacheSize}, ${key}`);
             return;
         }
 
-        while (this.cacheSize + size > this.config.maxSize) {
+        while (this.cacheSize + size > this.config.maxCacheSize) {
             await this.freeOneCachedItem();
         }
 
@@ -166,12 +165,12 @@ export class Service {
             throw new Error(`Cannot update image that is not in cache, ${key}`);
         }
 
-        if (optimizedData.byteLength > this.config.maxSize) {
-            console.warn(`Image is too large to fit in cache ${optimizedData.byteLength} > ${this.config.maxSize}, ${key}`);
+        if (optimizedData.byteLength > this.config.maxCacheSize) {
+            console.warn(`Image is too large to fit in cache ${optimizedData.byteLength} > ${this.config.maxCacheSize}, ${key}`);
             return;
         }
 
-        while (this.cacheSize - index.dataSize + optimizedData.byteLength > this.config.maxSize) {
+        while (this.cacheSize - index.dataSize + optimizedData.byteLength > this.config.maxCacheSize) {
             await this.freeOneCachedItem();
         }
 

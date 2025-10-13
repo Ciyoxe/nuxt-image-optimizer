@@ -1,4 +1,4 @@
-import type { Clamping, Time, Size } from './runtime/configs';
+import type { Clamping, Size, Time } from "./runtime/shared/configs";
 
 type ScreenSizeOptions = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 type FormatOptions = 'webp' | 'avif' | 'jpeg' | 'png';
@@ -30,7 +30,7 @@ export type ModuleConfig = {
     format: Format;
     cache: Cache;
     autoRefresh: AutoRefresh;
-    domains: 'all' | 'local' | Array<string | RegExp>;
+    domains: string[];
 };
 
 export const defaultModuleConfig: Readonly<ModuleConfig> = {
@@ -59,5 +59,5 @@ export const defaultModuleConfig: Readonly<ModuleConfig> = {
         xl: '<1280',
         xxl: '<1536',
     },
-    domains: 'all',
+    domains: [],
 };
