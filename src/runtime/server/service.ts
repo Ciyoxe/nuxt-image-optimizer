@@ -8,6 +8,10 @@ import type { ImageData } from './image-fetcher';
 type Config = {
     maxSize: number;
     autoUpdateTimeout: number;
+    mainQueueSize: number;
+    mainQueueTimeout: number;
+    backgroundQueueSize: number;
+    backgroundQueueTimeout: number;
 };
 
 type CacheIndexItem = {
@@ -28,16 +32,16 @@ type CacheIndexItem = {
 export class Service {
     private lock = new CacheLock();
 
+    private config: Config;
+
     // task for fetching new images, high prior
-    private mainTasksQueue = new AsyncQueue(1000, 5000);
+    private mainTasksQueue: AsyncQueue;
     // task for updating existing images in background, low prior
-    private backgroundTasksQueue = new AsyncQueue(1000, 5000);
+    private backgroundTasksQueue: AsyncQueue;
 
     private cacheDataStorage = useStorage<Buffer>('cached-image-optimizer:cache');
     private cacheIndex = new Map<string, CacheIndexItem>();
     private cacheSize = 0;
-
-    private config: Config;
 
     private imgFetcher = new ImageFetcher();
     private imgOptimizer = new ImageOptimizer();
@@ -46,6 +50,9 @@ export class Service {
 
     constructor(config: Config) {
         this.config = config;
+
+        this.mainTasksQueue = new AsyncQueue(config.mainQueueSize, config.mainQueueTimeout);
+        this.backgroundTasksQueue = new AsyncQueue(config.backgroundQueueSize, config.backgroundQueueTimeout);
     }
 
     async make() {
@@ -74,20 +81,20 @@ export class Service {
             if (time - v.lastUpdated > this.config.autoUpdateTimeout && !this.backgroundTasksQueue.hasTaskInQueue(k)) {
                 this.backgroundTasksQueue.add(k, async () => {
                     const image = await this.imgFetcher.fetchImage(v.original.url);
-                    const optimized = await this.imgOptimizer.optimizeImage(image, v.settings);
-                    await this.lock.withKeyLocked(k, () => this.updateImageInCache(k, image, optimized.data));
+                    if (v.original.hash !== image.hash) {
+                        const optimized = await this.imgOptimizer.optimizeImage(image, v.settings);
+                        await this.lock.withKeyLocked(k, () => this.updateImageInCache(k, image, optimized.data));
+                    }
                 });
             }
+
+            v.agingCounter *= 0.85;
         }
 
         if (this.mainTasksQueue.length()) {
             this.backgroundTasksQueue.stop();
         } else {
             this.backgroundTasksQueue.start();
-        }
-
-        for (const v of this.cacheIndex.values()) {
-            v.agingCounter *= 0.85;
         }
     }
 
