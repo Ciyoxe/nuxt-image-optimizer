@@ -19,6 +19,7 @@ export default defineNuxtModule<ModuleConfig>({
             },
         };
 
+        nuxt.options.runtimeConfig.public.cachedImageOptimizerSizes = config.sizes;
         nuxt.options.runtimeConfig.cachedImageOptimizer = config;
         nuxt.options.nitro ||= {};
         nuxt.options.nitro.storage = {
@@ -37,7 +38,7 @@ export default defineNuxtModule<ModuleConfig>({
             route: '/api/__cimgopt',
         });
         addComponent({
-            filePath: resolver.resolve('./runtime/components/o-img'),
+            filePath: resolver.resolve('./runtime/components/o-img/index.vue'),
             name: 'o-img',
         });
     },

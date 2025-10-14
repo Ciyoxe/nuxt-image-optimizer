@@ -28,9 +28,10 @@ export class ImageOptimizer {
                 additionalOptions.progressive = true;
                 break;
             case 'webp':
-                additionalOptions.effort = 6;
+                additionalOptions.effort = 4;
                 break;
             case 'avif':
+                additionalOptions.effort = 6;
                 additionalOptions.chromaSubsampling = settings.quality > 75 ? '4:4:4' : '4:2:0';
                 break;
         }

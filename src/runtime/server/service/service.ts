@@ -1,8 +1,8 @@
 import { useStorage } from 'nitropack/runtime';
 import { CacheLock } from './cache-lock';
 import { AsyncQueue } from './async-queue';
-import { ImageOptimizer, type ImageSettings } from './image-optimizer';
 import { ImageFetcher, type ImageData } from './image-fetcher';
+import { ImageOptimizer, type ImageSettings } from './image-optimizer';
 
 type Config = {
     maxCacheSize: number;

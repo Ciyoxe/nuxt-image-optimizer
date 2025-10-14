@@ -1,9 +1,7 @@
-import type { MediaQuery, Size, Time } from "./runtime/shared/configs";
+import type { Size, Time } from "./runtime/shared/configs";
 
-type ScreenSizeOptions = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+type ScreenSizeOptions = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | (string & {});
 type FormatOptions = 'webp' | 'avif' | 'jpeg' | 'png';
-
-type Sizes = Record<ScreenSizeOptions, MediaQuery>;
 
 type Format = {
     format: FormatOptions;
@@ -26,9 +24,9 @@ type AutoRefresh = {
 };
 
 export type ModuleConfig = {
-    sizes: Sizes;
     format: Format;
     cache: Cache;
+    sizes: Record<ScreenSizeOptions, string>;
     autoRefresh: AutoRefresh;
     domains: string[];
 };
@@ -52,12 +50,12 @@ export const defaultModuleConfig: Readonly<ModuleConfig> = {
         height: 8192,
     },
     sizes: {
-        xs: 'width < 320px',
-        sm: 'width < 640px',
-        md: 'width < 768px',
-        lg: 'width < 1024px',
-        xl: 'width < 1280px',
-        xxl: 'width < 1536px',
+        xs: '(width < 320px)',
+        sm: '(320px <= width < 640px)',
+        md: '(640px <= width < 768px)',
+        lg: '(768px <= width < 1024px)',
+        xl: '(1024px <= width < 1280px)',
+        xxl: '(width > 1280px)',
     },
     domains: [],
 };
