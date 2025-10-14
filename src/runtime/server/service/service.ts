@@ -54,7 +54,7 @@ export class Service {
         this.backgroundTasksQueue = new AsyncQueue(config.backgroundQueueSize, config.backgroundQueueTimeout);
     }
 
-    async make() {
+    async init() {
         await this.lock.withGlobalLock(async () => {
             await this.cacheDataStorage.clear();
             this.cacheIndex.clear();
@@ -218,5 +218,23 @@ export class Service {
 
         // return original image if its not converted yet
         return image.data;
+    }
+
+    async getImageSize(url: string, settings: ImageSettings) {
+        const key = this.getKey(url, settings);
+
+        const cachedIndex = this.cacheIndex.get(key);
+        if (cachedIndex) {
+            return {
+                w: cachedIndex.original.width,
+                h: cachedIndex.original.height,
+            };
+        }
+
+        const image = await this.imgFetcher.fetchImage(url);
+        return {
+            w: image.width,
+            h: image.height,
+        };
     }
 }

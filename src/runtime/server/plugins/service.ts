@@ -8,7 +8,7 @@ export default defineNitroPlugin(async (nitro) => {
         throw new Error('Cached image optimizer is not configured');
     }
 
-    const service = await new Service({
+    const service = new Service({
         autoRefreshInterval: getTimeInMilliseconds(config.autoRefresh.maxAge),
 
         backgroundQueueSize: config.autoRefresh.queueSize,
@@ -18,7 +18,9 @@ export default defineNitroPlugin(async (nitro) => {
         mainQueueTimeout: getTimeInMilliseconds(config.cache.queueTimeout),
 
         maxCacheSize: getSizeInBytes(config.cache.maxSize),
-    }).make();
+    });
+
+    await service.init();
 
     nitro.hooks.hook('request', (event) => {
         event.context.service = service;
