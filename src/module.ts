@@ -1,4 +1,4 @@
-import { defineNuxtModule, createResolver, addComponent, addServerPlugin } from '@nuxt/kit';
+import { defineNuxtModule, createResolver, addComponent, addServerPlugin, addServerHandler } from '@nuxt/kit';
 import { type ModuleConfig, defaultModuleConfig } from './options';
 
 export default defineNuxtModule<ModuleConfig>({
@@ -31,10 +31,14 @@ export default defineNuxtModule<ModuleConfig>({
         };
 
         const resolver = createResolver(import.meta.url);
-        addComponent({
-            name: 'o-img',
-            filePath: resolver.resolve('./runtime/components/o-img'),
-        });
         addServerPlugin(resolver.resolve('./runtime/server/plugins/service'));
+        addServerHandler({
+            handler: resolver.resolve('./runtime/server/api/cimgopt.get'),
+            route: '/api/__cimgopt',
+        });
+        addComponent({
+            filePath: resolver.resolve('./runtime/components/o-img'),
+            name: 'o-img',
+        });
     },
 });

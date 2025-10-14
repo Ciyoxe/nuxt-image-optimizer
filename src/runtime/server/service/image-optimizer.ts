@@ -2,19 +2,18 @@ import sharp from 'sharp';
 import type { AvifOptions, JpegOptions, PngOptions, WebpOptions } from 'sharp';
 import type { ImageData } from './image-fetcher';
 
-
 export type ImageSettings = {
     format: 'webp' | 'avif' | 'jpeg' | 'png';
+    width: number;
+    height: number;
     quality: number;
-    maxWidth: number;
-    maxHeight: number;
 };
 
 export class ImageOptimizer {
     async optimizeImage(image: ImageData, settings: ImageSettings) {
-        let { width, height } = image;
+        let { width, height, data } = image;
 
-        const scale = Math.min(settings.maxWidth / width, settings.maxHeight / height);
+        const scale = Math.min(settings.width / width, settings.height / height);
         if (scale < 1) {
             width = Math.round(width * scale);
             height = Math.round(height * scale);
@@ -32,7 +31,6 @@ export class ImageOptimizer {
                 additionalOptions.effort = 6;
                 break;
             case 'avif':
-                additionalOptions.effort = 9;
                 additionalOptions.chromaSubsampling = settings.quality > 75 ? '4:4:4' : '4:2:0';
                 break;
         }
@@ -40,7 +38,7 @@ export class ImageOptimizer {
         return {
             width,
             height,
-            data: await sharp(image.data)
+            data: await sharp(data)
                 .resize(width, height, {
                     fit: 'inside',
                     kernel: 'lanczos3',

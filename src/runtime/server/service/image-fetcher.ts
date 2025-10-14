@@ -23,7 +23,7 @@ export class ImageFetcher {
 
     private fetchRawData(url: string) {
         if (url.startsWith('/')) {
-            return this.localStorage.getItemRaw<Buffer>(url);
+            return this.localStorage.getItemRaw<Buffer>(url.slice(1).replaceAll('/', ':'));
         } else {
             return $fetch<ArrayBuffer>(url, { responseType: 'arrayBuffer' }).then((res) => Buffer.from(res));
         }

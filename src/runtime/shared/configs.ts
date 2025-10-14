@@ -1,6 +1,11 @@
 export type Size = `${number}${'B' | 'KB' | 'MB' | 'GB'}`;
 export type Time = `${number}${'s' | 'm' | 'h' | 'd'}`;
-export type Clamping = `${'<' | '<=' | '>' | '>='}${number}`;
+
+type LengthUnit = 'px' | 'cm' | 'mm' | 'Q' | 'in' | 'pt' | 'pc' | 'em' | 'rem' | 'cap' | 'ch' | 'ex' | 'ic' | 'lh' | 'rcap' | 'rch' | 'rex' | 'ric' | 'rlh';
+export type MediaQuery =
+    `${'min-width' | 'max-width' | 'min-height' | 'max-height'}: ${number}${LengthUnit}` |
+    `${'width' | 'height'} ${'<' | '<=' | '>' | '>='} ${number}${LengthUnit}` |
+    `${number}${LengthUnit} ${'<' | '<=' | '>' | '>='} ${'width' | 'height'} ${'<' | '<=' | '>' | '>='} ${number}${LengthUnit}`;
 
 export const getSizeInBytes = (size: string) => {
     const trimmedSize = size.trim();

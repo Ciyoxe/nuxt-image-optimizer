@@ -1,6 +1,6 @@
 <template>
     <div>Nuxt module playground!</div>
-    <OImg />
+    <OImg src="https://placehold.co/4000x4000/png" format="avif" />
 </template>
 
 <style>

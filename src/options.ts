@@ -1,9 +1,9 @@
-import type { Clamping, Size, Time } from "./runtime/shared/configs";
+import type { MediaQuery, Size, Time } from "./runtime/shared/configs";
 
 type ScreenSizeOptions = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
 type FormatOptions = 'webp' | 'avif' | 'jpeg' | 'png';
 
-type Sizes = Record<ScreenSizeOptions, Clamping>;
+type Sizes = Record<ScreenSizeOptions, MediaQuery>;
 
 type Format = {
     format: FormatOptions;
@@ -52,12 +52,12 @@ export const defaultModuleConfig: Readonly<ModuleConfig> = {
         height: 8192,
     },
     sizes: {
-        xs: '<320',
-        sm: '<640',
-        md: '<768',
-        lg: '<1024',
-        xl: '<1280',
-        xxl: '<1536',
+        xs: 'width < 320px',
+        sm: 'width < 640px',
+        md: 'width < 768px',
+        lg: 'width < 1024px',
+        xl: 'width < 1280px',
+        xxl: 'width < 1536px',
     },
     domains: [],
 };

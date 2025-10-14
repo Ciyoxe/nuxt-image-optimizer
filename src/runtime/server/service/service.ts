@@ -98,7 +98,7 @@ export class Service {
     }
 
     private getKey(url: string, settings: ImageSettings) {
-        return `${url}-${settings.format}-${settings.quality}-${settings.maxWidth}-${settings.maxHeight}`;
+        return `${url}-${settings.format}-${settings.quality}-${settings.width}-${settings.height}`;
     }
 
     private async removeImageFromCache(key: string) {
