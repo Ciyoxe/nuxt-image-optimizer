@@ -1,5 +1,17 @@
 <template>
-    <img ref="img" :style :srcset :sizes :data-placeholder-shown="placeholderShown" v-bind="$attrs" @load="onImageLoad" @error="onImageError" />
+    <img
+        ref="img"
+        class="o-img"
+        v-bind="$attrs"
+        :style
+        :srcset
+        :sizes
+        :alt
+        :role
+        :data-placeholder-shown="placeholderShown"
+        @load="onImageLoad"
+        @error="onImageError"
+    />
 </template>
 
 <script setup lang="ts">
@@ -30,10 +42,11 @@ onMounted(() => {
         image.srcset = originalSrcset.value;
 
         image.onload = () => {
-            placeholderShown.value = false;
             image.remove();
+            placeholderShown.value = false;
         };
         image.onerror = () => {
+            image.remove();
             emit('error');
         };
     }
@@ -77,6 +90,21 @@ const sizes = computed(() => {
     }
     if (sizes.length) return sizes.join(', ');
 });
+
+const alt = computed(() => {
+    if (props.alt) {
+        return props.alt;
+    }
+    return '';
+});
+
+const role = computed(() => {
+    if (props.role) {
+        return props.role;
+    }
+    return props.alt ? undefined : 'presentation';
+});
+
 
 const onImageLoad = () => {
     if (placeholderShown.value) {
@@ -131,7 +159,12 @@ const getImageSizesSrc = (width?: number, height?: number, format?: string, qual
 // if there is no placeholder or srcset, use query with url only (highly-likely cache miss and refetch on backend)
 const getAnySrcForSizes = () => {
     if (props.placeholder) {
-        return getImageSizesSrc(props.placeholder.width, props.placeholder.height, props.format, props.placeholder.quality ?? props.quality);
+        return getImageSizesSrc(
+            props.placeholder.width,
+            props.placeholder.height,
+            props.format,
+            props.placeholder.quality ?? props.quality,
+        );
     }
     if (typeof props.srcset === 'number') {
         return getImageSizesSrc(props.srcset, undefined, props.format, props.quality);
@@ -147,14 +180,16 @@ const getAnySrcForSizes = () => {
 
 // api endpoint returns original image sizes, so, we don't care about conversion settings
 const { data: ssrSize } = await useFetch<{ w: number; h: number }>(getAnySrcForSizes(), {
-    key: () => `oimg-ssr-size-${props.src}`
+    key: () => `oimg-ssr-size-${props.src}`,
 });
 
 const style = computed(() => {
     return {
         '--original-width': ssrSize.value ? `${ssrSize.value.w}px` : undefined,
         '--original-height': ssrSize.value ? `${ssrSize.value.h}px` : undefined,
-        '--aspect-ratio': ssrSize.value ? `${ssrSize.value.h / ssrSize.value.w}` : undefined,
+        '--aspect-ratio': ssrSize.value ? `${ssrSize.value.w / ssrSize.value.h}` : undefined,
     };
 });
 </script>
+
+<style scoped lang="css" src="./styles.css" />

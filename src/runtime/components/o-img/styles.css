@@ -1,0 +1,3 @@
+:where(.o-img) {
+    aspect-ratio: var(--aspect-ratio);
+}
