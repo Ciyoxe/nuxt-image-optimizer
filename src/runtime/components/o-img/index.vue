@@ -1,63 +1,33 @@
 <template>
     <img
-        ref="img"
         class="o-img"
         v-bind="$attrs"
+        data-allow-mismatch
         :style
-        :srcset
+        :srcset="placeholderSrcset ?? originalSrcset"
         :sizes
         :alt
         :role
-        @load="onImageLoad"
-        @error="onImageError"
-        data-allow-mismatch="true"
-        onload="if (this.attributes['data-status']?.textContent === 'placeholder') { this.setAttribute('data-status', 'completed') } else { this.setAttribute('data-status', 'placeholder') }"
-        onerror="this.setAttribute('data-status', 'error')"
+        :data-oimg-srcset="originalSrcset"
+        :data-oimg-placeholder="placeholderSrcset"
+        onload="if (this.srcset === this.dataset.oimgPlaceholder) { this.dataset.status = 'placeholder'; this.srcset = this.dataset.oimgSrcset } else { this.dataset.status = 'completed' }"
+        onerror="if (this.srcset === this.dataset.oimgPlaceholder) { this.srcset = this.dataset.oimgSrcset } else { this.dataset.status = 'error' }"
     />
 </template>
 
 <script setup lang="ts">
-import { useFetch, useRuntimeConfig } from '#app';
-import { computed, onMounted, ref, watch } from 'vue';
+import { useFetch, useHead, useRuntimeConfig } from '#app';
+import { computed, ref } from 'vue';
 import type { OImgProps } from './types';
 
 const mediaSizes = useRuntimeConfig().public.cachedImageOptimizerSizes;
 const props = defineProps<OImgProps>();
 const emit = defineEmits(['load', 'load:placeholder', 'error', 'error:placeholder']);
 
-const img = ref<HTMLImageElement>();
-const placeholderShown = ref(Boolean(props.placeholder));
-
-onMounted(() => {
-    if (placeholderShown.value) {
-        const image = new Image();
-        image.sizes = sizes.value ?? '';
-        image.srcset = originalSrcset.value;
-
-        image.onload = () => {
-            image.remove();
-            placeholderShown.value = false;
-        };
-        image.onerror = () => {
-            image.remove();
-            emit('error');
-        };
-    }
-});
-
-const srcset = computed(() => {
-    if (placeholderShown.value) {
-        return placeholderSrcset.value;
-    }
-
-    return originalSrcset.value;
-});
-
 const placeholderSrcset = computed(() => {
     if (props.placeholder) {
         return getImageSrc(props.placeholder.width, props.placeholder.height, props.format, props.placeholder.quality ?? props.quality);
     }
-    return '';
 });
 
 const originalSrcset = computed(() => {
@@ -97,37 +67,6 @@ const role = computed(() => {
     }
     return props.alt ? undefined : 'presentation';
 });
-
-const onImageLoad = () => {
-    if (placeholderShown.value) {
-        emit('load:placeholder');
-    } else {
-        emit('load');
-    }
-};
-
-const onImageError = () => {
-    if (placeholderShown.value) {
-        emit('error:placeholder');
-    } else {
-        emit('error');
-    }
-};
-
-// if image loaded while component wasn't hydrated, it won't emit @load vue event
-watch(
-    img,
-    (img) => {
-        if (img?.complete) {
-            if (img.naturalWidth && img.naturalHeight) {
-                onImageLoad();
-            } else {
-                onImageError();
-            }
-        }
-    },
-    { immediate: true },
-);
 
 const getImageSrc = (width?: number, height?: number, format?: string, quality?: string | number) => {
     const params = new URLSearchParams({ url: props.src || '' });
@@ -183,6 +122,28 @@ const style = computed(() => {
         '--aspect-ratio': ssrSize.value ? ssrSize.value.w / ssrSize.value.h : undefined,
     };
 });
+
+if (props.preload) {
+    const link = [
+        {
+            rel: 'preload',
+            as: 'image',
+            imagesizes: sizes.value,
+            imagesrcset: originalSrcset.value,
+            fetchpriority: 'high',
+        },
+    ];
+    if (placeholderSrcset.value) {
+        link.push({
+            rel: 'preload',
+            as: 'image',
+            imagesizes: sizes.value,
+            imagesrcset: placeholderSrcset.value,
+            fetchpriority: 'high',
+        });
+    }
+    useHead({ link: link as any });
+}
 </script>
 
 <style scoped lang="css" src="./styles.css" />

@@ -5,14 +5,24 @@
     <OImg
         class="img"
         src="https://placehold.co/4000x2000/png"
-        format="avif"
-        srcset="1000px"
+        format="jpeg"
+        srcset="4000px"
+        quality="100"
+        preload
         :placeholder="{ quality: 40, width: 70 }"
         @load="console.log('image loaded')"
         @load:placeholder="console.log('placeholder loaded')"
     />
     <p>bottom text</p>
-</template>
+</template>: [
+{
+    rel: 'preload',
+    as: 'image',
+    imagesizes: sizes.value,
+    imagesrcset: originalSrcset.value,
+    fetchpriority: 'high',
+},
+]
 
 <style scoped lang="css">
 .img {
