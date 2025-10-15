@@ -3,5 +3,12 @@ export default defineNuxtConfig({
     devtools: { enabled: true },
     modules: ['../src/module'],
 
-    cachedImageOptimizer: {},
+    cachedImageOptimizer: {
+        cache: {
+            maxSize: '20MB',
+            queueSize: 1000,
+            queueTimeout: '5s',
+            storagePath: '.cache/oimgs',
+        }
+    },
 });

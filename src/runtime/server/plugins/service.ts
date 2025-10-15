@@ -19,7 +19,7 @@ export default defineNitroPlugin(async (nitro) => {
 
         maxCacheSize: getSizeInBytes(config.cache.maxSize),
 
-        cpuEffort: config.format.cpuEffort,
+        cpuEffort: config.conversion.cpuEffort,
     });
 
     await service.init();

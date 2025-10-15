@@ -17,8 +17,12 @@
 <style scoped lang="css">
 .img {
     width: 500px;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.1s ease-in-out;
     opacity: 0;
+}
+
+.img[data-status='placeholder'] {
+    opacity: 0.5;
 }
 
 .img[data-status='completed'] {

@@ -8,11 +8,10 @@
         :sizes
         :alt
         :role
-        :data-placeholder-shown="placeholderShown"
         @load="onImageLoad"
         @error="onImageError"
         data-allow-mismatch="true"
-        onload="this.setAttribute('data-status', 'completed')"
+        onload="if (this.attributes['data-status']?.textContent === 'placeholder') { this.setAttribute('data-status', 'completed') } else { this.setAttribute('data-status', 'placeholder') }"
         onerror="this.setAttribute('data-status', 'error')"
     />
 </template>
@@ -179,9 +178,9 @@ const { data: ssrSize } = await useFetch<{ w: number; h: number }>(getAnySrcForS
 
 const style = computed(() => {
     return {
-        '--original-width': ssrSize.value ? `${ssrSize.value.w}px` : undefined,
-        '--original-height': ssrSize.value ? `${ssrSize.value.h}px` : undefined,
-        '--aspect-ratio': ssrSize.value ? `${ssrSize.value.w / ssrSize.value.h}` : undefined,
+        '--original-width': ssrSize.value ? ssrSize.value.w : undefined,
+        '--original-height': ssrSize.value ? ssrSize.value.h : undefined,
+        '--aspect-ratio': ssrSize.value ? ssrSize.value.w / ssrSize.value.h : undefined,
     };
 });
 </script>

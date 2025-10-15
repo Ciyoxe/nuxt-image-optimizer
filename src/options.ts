@@ -25,7 +25,7 @@ type AutoRefresh = {
 };
 
 export type ModuleConfig = {
-    format: Conversion;
+    conversion: Conversion;
     cache: Cache;
     sizes: Record<ScreenSizeOptions, string>;
     autoRefresh: AutoRefresh;
@@ -44,11 +44,11 @@ export const defaultModuleConfig: Readonly<ModuleConfig> = {
         queueSize: 10,
         queueTimeout: '5s',
     },
-    format: {
+    conversion: {
         format: 'webp',
         quality: 80,
-        width: 8192,
-        height: 8192,
+        width: 4096,
+        height: 4096,
         cpuEffort: 6,
     },
     sizes: {

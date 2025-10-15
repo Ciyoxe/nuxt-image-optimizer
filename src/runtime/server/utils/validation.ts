@@ -5,10 +5,10 @@ const config = useRuntimeConfig().cachedImageOptimizer;
 
 export const validateParams = (params: Record<string, string>) => {
     const settings = {
-        format: config.format.format as 'webp' | 'avif' | 'jpeg' | 'png',
-        quality: config.format.quality,
-        width: config.format.width,
-        height: config.format.height,
+        format: config.conversion.format as 'webp' | 'avif' | 'jpeg' | 'png',
+        quality: config.conversion.quality,
+        width: config.conversion.width,
+        height: config.conversion.height,
         url: '',
     };
     switch (params.f) {
