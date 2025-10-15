@@ -207,19 +207,20 @@ export class Service {
             return cachedData;
         }
 
-        const image = await this.imgFetcher.fetchImage(url);
-
         if (!this.mainTasksQueue.hasTaskInQueue(key)) {
             this.mainTasksQueue.add(key, async () => {
+                const image = await this.imgFetcher.fetchImage(url);
                 const optimized = await this.imgOptimizer.optimizeImage(image, settings);
                 await this.lock.withKeyLocked(key, () => this.addImageToCache(key, settings, image, optimized.data));
             });
         }
 
         // return original image if its not converted yet
-        return image.data;
+        return (await this.imgFetcher.fetchImage(url)).data;
     }
 
+    // this method required settings to not making additional sizes cache
+    // in most cases, sizes will be retrieved from cache
     async getImageSize(url: string, settings: ImageSettings) {
         const key = this.getKey(url, settings);
 
