@@ -17,6 +17,11 @@
 <style scoped lang="css">
 .img {
     width: 500px;
-    transition: filter 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+.img[data-status='completed'] {
+    opacity: 1;
 }
 </style>

@@ -11,12 +11,15 @@
         :data-placeholder-shown="placeholderShown"
         @load="onImageLoad"
         @error="onImageError"
+        data-allow-mismatch="true"
+        onload="this.setAttribute('data-status', 'completed')"
+        onerror="this.setAttribute('data-status', 'error')"
     />
 </template>
 
 <script setup lang="ts">
-import { createError, useFetch, useRuntimeConfig } from '#app';
-import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+import { useFetch, useRuntimeConfig } from '#app';
+import { computed, onMounted, ref, watch } from 'vue';
 import type { OImgProps } from './types';
 
 const mediaSizes = useRuntimeConfig().public.cachedImageOptimizerSizes;
@@ -95,7 +98,6 @@ const role = computed(() => {
     }
     return props.alt ? undefined : 'presentation';
 });
-
 
 const onImageLoad = () => {
     if (placeholderShown.value) {
