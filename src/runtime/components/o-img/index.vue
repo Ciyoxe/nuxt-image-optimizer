@@ -1,16 +1,59 @@
 <template>
-    <img :srcset :sizes v-bind="$attrs" />
+    <img ref="img" :srcset :sizes :data-placeholder-shown="placeholderShown" v-bind="$attrs" @load="onImageLoad" @error="onImageError" />
 </template>
 
 <script setup lang="ts">
-import { useRuntimeConfig } from '#app';
-import { computed } from 'vue';
+import { createError, useRuntimeConfig } from '#app';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import type { OImgProps } from './types';
 
 const mediaSizes = useRuntimeConfig().public.cachedImageOptimizerSizes;
 const props = defineProps<OImgProps>();
+const emit = defineEmits(['load', 'load:placeholder', 'error', 'error:placeholder']);
+
+const img = ref<HTMLImageElement>();
+const placeholderShown = ref(Boolean(props.placeholder));
+
+watchEffect(() => {
+    if (props.placeholder && !props.placeholder.width && !props.placeholder.height) {
+        throw createError({
+            fatal: false,
+            statusMessage: 'Placeholder width or height is required (at least one of them)',
+        });
+    }
+});
+
+onMounted(() => {
+    if (placeholderShown.value) {
+        const image = new Image();
+        image.sizes = sizes.value ?? '';
+        image.srcset = originalSrcset.value;
+
+        image.onload = () => {
+            placeholderShown.value = false;
+            image.remove();
+        };
+        image.onerror = () => {
+            emit('error');
+        };
+    }
+});
 
 const srcset = computed(() => {
+    if (placeholderShown.value) {
+        return placeholderSrcset.value;
+    }
+    return originalSrcset.value;
+});
+
+const placeholderSrcset = computed(() => {
+    if (props.placeholder) {
+        return getImageSrc(props.placeholder.width, props.placeholder.height, props.format, props.placeholder.quality ?? props.quality);
+    }
+    return '';
+});
+
+const originalSrcset = computed(() => {
     if (typeof props.srcset === 'number') {
         return getImageSrc(props.srcset, undefined, props.format, props.quality);
     }
@@ -33,6 +76,37 @@ const sizes = computed(() => {
     }
     if (sizes.length) return sizes.join(', ');
 });
+
+const onImageLoad = () => {
+    if (placeholderShown.value) {
+        emit('load:placeholder');
+    } else {
+        emit('load');
+    }
+};
+
+const onImageError = () => {
+    if (placeholderShown.value) {
+        emit('error:placeholder');
+    } else {
+        emit('error');
+    }
+};
+
+// if image loaded while component wasn't hydrated, it won't emit @load event
+watch(
+    img,
+    (img) => {
+        if (img?.complete) {
+            if (img.naturalWidth && img.naturalHeight) {
+                onImageLoad();
+            } else {
+                onImageError();
+            }
+        }
+    },
+    { immediate: true },
+);
 
 const getImageSrc = (width?: number, height?: number, format?: string, quality?: string | number) => {
     const params = new URLSearchParams({ url: props.src || '' });

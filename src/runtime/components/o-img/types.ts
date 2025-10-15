@@ -8,4 +8,5 @@ export type OImgProps = {
     srcset?: number[] | number | `${number}px`;
     sizes?: Partial<Record<ScreenSizeOptions, string | number>>;
     placeholder?: { quality?: number, width?: number, height?: number };
+    loading?: 'lazy' | 'eager';
 };
