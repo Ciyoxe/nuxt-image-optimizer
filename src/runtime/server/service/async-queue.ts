@@ -64,7 +64,7 @@ export class AsyncQueue {
         }
     }
 
-    add(key: string, task: Task<unknown>, priority: 'high' | 'low' = 'low') {
+    add(key: string, task: Task<unknown>) {
         if (this.queue.length >= this.maxLength) {
             console.warn(`Queue is full, task ${key} not added`);
             return;
@@ -73,11 +73,7 @@ export class AsyncQueue {
             console.warn(`Task ${key} is already in queue`);
         }
 
-        if (priority === 'high') {
-            this.queue.unshift([key, task]);
-        } else {
-            this.queue.push([key, task]);
-        }
+        this.queue.push([key, task]);
         this.tryRunTask();
     }
 

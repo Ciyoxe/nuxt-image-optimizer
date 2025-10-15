@@ -10,7 +10,7 @@ export type ImageSettings = {
 };
 
 export class ImageOptimizer {
-    async optimizeImage(image: ImageData, settings: ImageSettings) {
+    async optimizeImage(image: ImageData, settings: ImageSettings, cpuEffort: number) {
         let { width, height, data } = image;
 
         const scale = Math.min(settings.width / width, settings.height / height);
@@ -22,16 +22,19 @@ export class ImageOptimizer {
         const additionalOptions = {} as PngOptions & JpegOptions & WebpOptions & AvifOptions;
         switch (settings.format) {
             case 'png':
+                additionalOptions.compressionLevel = 9;
                 additionalOptions.progressive = true;
+                additionalOptions.effort = Math.min(cpuEffort, 10);
                 break;
             case 'jpeg':
                 additionalOptions.progressive = true;
+                additionalOptions.chromaSubsampling = settings.quality > 75 ? '4:4:4' : '4:2:0';
                 break;
             case 'webp':
-                additionalOptions.effort = 4;
+                additionalOptions.effort = Math.min(cpuEffort, 6);
                 break;
             case 'avif':
-                additionalOptions.effort = 6;
+                additionalOptions.effort = Math.min(cpuEffort, 9);
                 additionalOptions.chromaSubsampling = settings.quality > 75 ? '4:4:4' : '4:2:0';
                 break;
         }

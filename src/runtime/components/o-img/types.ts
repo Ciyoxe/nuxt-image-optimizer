@@ -1,4 +1,3 @@
-// Document structure roles
 type DocumentStructureRole =
     | 'toolbar'
     | 'tooltip'
@@ -42,7 +41,6 @@ type DocumentStructureRole =
     | 'superscript'
     | 'time';
 
-// Widget roles
 type WidgetRole =
     | 'scrollbar'
     | 'searchbox'
@@ -64,53 +62,19 @@ type WidgetRole =
     | 'radio'
     | 'textbox';
 
-// Composite widget roles
-type CompositeWidgetRole =
-    | 'combobox'
-    | 'menu'
-    | 'menubar'
-    | 'tablist'
-    | 'tree'
-    | 'treegrid'
-    | 'grid'
-    | 'listbox'
-    | 'radiogroup';
+type CompositeWidgetRole = 'combobox' | 'menu' | 'menubar' | 'tablist' | 'tree' | 'treegrid' | 'grid' | 'listbox' | 'radiogroup';
 
-// Landmark roles
-type LandmarkRole =
-    | 'banner'
-    | 'complementary'
-    | 'contentinfo'
-    | 'form'
-    | 'main'
-    | 'navigation'
-    | 'region'
-    | 'search';
+type LandmarkRole = 'banner' | 'complementary' | 'contentinfo' | 'form' | 'main' | 'navigation' | 'region' | 'search';
 
-// Live region roles
-type LiveRegionRole =
-    | 'alert'
-    | 'log'
-    | 'marquee'
-    | 'status'
-    | 'timer';
+type LiveRegionRole = 'alert' | 'log' | 'marquee' | 'status' | 'timer';
 
-// Window roles
-type WindowRole =
-    | 'alertdialog'
-    | 'dialog';
+type WindowRole = 'alertdialog' | 'dialog';
 
-type AriaRole =
-    | ''
-    | DocumentStructureRole
-    | WidgetRole
-    | CompositeWidgetRole
-    | LandmarkRole
-    | LiveRegionRole
-    | WindowRole;
+type AriaRole = '' | DocumentStructureRole | WidgetRole | CompositeWidgetRole | LandmarkRole | LiveRegionRole | WindowRole;
 
 type ScreenSizeOptions = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | (string & {});
 
+type Placeholder = { quality?: number } & ({ width: number; height?: number } | { width?: number; height: number });
 
 export type OImgProps = {
     src?: string;
@@ -120,6 +84,6 @@ export type OImgProps = {
     quality?: string | number;
     srcset?: number[] | number | `${number}px`;
     sizes?: Partial<Record<ScreenSizeOptions, string | number>>;
-    placeholder?: { quality?: number, width?: number, height?: number };
+    placeholder?: Placeholder;
     loading?: 'lazy' | 'eager';
 };

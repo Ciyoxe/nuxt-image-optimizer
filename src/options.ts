@@ -3,11 +3,12 @@ import type { Size, Time } from "./runtime/shared/configs";
 type ScreenSizeOptions = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | (string & {});
 type FormatOptions = 'webp' | 'avif' | 'jpeg' | 'png';
 
-type Format = {
+type Conversion = {
     format: FormatOptions;
     quality: number;
     width: number;
     height: number;
+    cpuEffort: number;
 };
 
 type Cache = {
@@ -24,7 +25,7 @@ type AutoRefresh = {
 };
 
 export type ModuleConfig = {
-    format: Format;
+    format: Conversion;
     cache: Cache;
     sizes: Record<ScreenSizeOptions, string>;
     autoRefresh: AutoRefresh;
@@ -48,6 +49,7 @@ export const defaultModuleConfig: Readonly<ModuleConfig> = {
         quality: 80,
         width: 8192,
         height: 8192,
+        cpuEffort: 6,
     },
     sizes: {
         xs: '(width < 320px)',

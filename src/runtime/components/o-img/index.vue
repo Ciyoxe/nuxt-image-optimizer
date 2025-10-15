@@ -26,15 +26,6 @@ const emit = defineEmits(['load', 'load:placeholder', 'error', 'error:placeholde
 const img = ref<HTMLImageElement>();
 const placeholderShown = ref(Boolean(props.placeholder));
 
-watchEffect(() => {
-    if (props.placeholder && !props.placeholder.width && !props.placeholder.height) {
-        throw createError({
-            fatal: false,
-            statusMessage: 'Placeholder width or height is required (at least one of them)',
-        });
-    }
-});
-
 onMounted(() => {
     if (placeholderShown.value) {
         const image = new Image();
@@ -181,6 +172,7 @@ const getAnySrcForSizes = () => {
 // api endpoint returns original image sizes, so, we don't care about conversion settings
 const { data: ssrSize } = await useFetch<{ w: number; h: number }>(getAnySrcForSizes(), {
     key: () => `oimg-ssr-size-${props.src}`,
+    watch: [() => props.src],
 });
 
 const style = computed(() => {

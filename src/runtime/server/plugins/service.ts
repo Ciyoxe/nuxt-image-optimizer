@@ -18,6 +18,8 @@ export default defineNitroPlugin(async (nitro) => {
         mainQueueTimeout: getTimeInMilliseconds(config.cache.queueTimeout),
 
         maxCacheSize: getSizeInBytes(config.cache.maxSize),
+
+        cpuEffort: config.format.cpuEffort,
     });
 
     await service.init();

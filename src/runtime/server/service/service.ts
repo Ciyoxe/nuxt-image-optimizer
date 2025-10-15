@@ -11,6 +11,7 @@ type Config = {
     mainQueueTimeout: number;
     backgroundQueueSize: number;
     backgroundQueueTimeout: number;
+    cpuEffort: number;
 };
 
 type CacheIndexItem = {
@@ -81,7 +82,7 @@ export class Service {
                 this.backgroundTasksQueue.add(k, async () => {
                     const image = await this.imgFetcher.fetchImage(v.original.url);
                     if (v.original.hash !== image.hash) {
-                        const optimized = await this.imgOptimizer.optimizeImage(image, v.settings);
+                        const optimized = await this.imgOptimizer.optimizeImage(image, v.settings, this.config.cpuEffort);
                         await this.lock.withKeyLocked(k, () => this.updateImageInCache(k, image, optimized.data));
                     }
                 });
@@ -210,7 +211,7 @@ export class Service {
         if (!this.mainTasksQueue.hasTaskInQueue(key)) {
             this.mainTasksQueue.add(key, async () => {
                 const image = await this.imgFetcher.fetchImage(url);
-                const optimized = await this.imgOptimizer.optimizeImage(image, settings);
+                const optimized = await this.imgOptimizer.optimizeImage(image, settings, this.config.cpuEffort);
                 await this.lock.withKeyLocked(key, () => this.addImageToCache(key, settings, image, optimized.data));
             });
         }

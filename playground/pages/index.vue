@@ -7,7 +7,7 @@
         src="https://placehold.co/4000x2000/png"
         format="avif"
         srcset="1000px"
-        :placeholder="{ width: 70, quality: 40 }"
+        :placeholder="{ quality: 40, width: 70 }"
         @load="console.log('image loaded')"
         @load:placeholder="console.log('placeholder loaded')"
     />
