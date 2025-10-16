@@ -1,5 +1,6 @@
 <template>
     <img
+        ref="img"
         class="o-img"
         v-bind="$attrs"
         data-allow-mismatch
@@ -10,19 +11,59 @@
         :role
         :data-oimg-srcset="originalSrcset"
         :data-oimg-placeholder="placeholderSrcset"
-        onload="if (this.srcset === this.dataset.oimgPlaceholder) { this.dataset.status = 'placeholder'; this.srcset = this.dataset.oimgSrcset } else { this.dataset.status = 'completed' }"
-        onerror="if (this.srcset === this.dataset.oimgPlaceholder) { this.srcset = this.dataset.oimgSrcset } else { this.dataset.status = 'error' }"
+        @load="handleLoad"
+        @error="handleError"
+        onload="this.srcset===this.dataset.oimgPlaceholder?(this.dataset.status='placeholder',this.srcset=this.dataset.oimgSrcset):this.dataset.status='completed'"
+        onerror="this.srcset===this.dataset.oimgPlaceholder?this.srcset=this.dataset.oimgSrcset:this.dataset.status='error'"
     />
 </template>
 
 <script setup lang="ts">
 import { useFetch, useHead, useRuntimeConfig } from '#app';
-import { computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import type { OImgProps } from './types';
 
 const mediaSizes = useRuntimeConfig().public.cachedImageOptimizerSizes;
 const props = defineProps<OImgProps>();
-const emit = defineEmits(['load', 'load:placeholder', 'error', 'error:placeholder']);
+const emit = defineEmits(['load', 'load:placeholder', 'error']);
+
+const img = ref<HTMLImageElement>();
+
+onMounted(() => {
+    // re-emit events if image was loaded before hydration
+    if (img.value) {
+        switch (img.value.dataset.status) {
+            case 'placeholder':
+                emit('load:placeholder');
+                break;
+            case 'completed':
+                emit('load:placeholder');
+                emit('load');
+                break;
+            case 'error':
+                emit('error');
+                break;
+        }
+    }
+});
+
+const handleLoad = () => {
+    if (!img.value) return;
+
+    if (!img.value.dataset.status) {
+        emit('load:placeholder');
+    } else {
+        emit('load');
+    }
+};
+
+const handleError = () => {
+    if (!img.value) return;
+
+    if (img.value.srcset !== img.value.dataset.oimgPlaceholder) {
+        emit('error');
+    }
+};
 
 const placeholderSrcset = computed(() => {
     if (props.placeholder) {
