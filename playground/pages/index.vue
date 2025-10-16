@@ -5,7 +5,7 @@
     <OImg
         class="img"
         src="https://placehold.co/4000x2000/png"
-        format="jpeg"
+        format="webp"
         srcset="4000px"
         quality="100"
         preload
@@ -14,21 +14,13 @@
         @load:placeholder="console.log('placeholder loaded')"
     />
     <p>bottom text</p>
-</template>: [
-{
-    rel: 'preload',
-    as: 'image',
-    imagesizes: sizes.value,
-    imagesrcset: originalSrcset.value,
-    fetchpriority: 'high',
-},
-]
+</template>
 
 <style scoped lang="css">
 .img {
     width: 500px;
     transition: opacity 0.1s ease-in-out;
-    opacity: 0;
+    opacity: 0.8;
 }
 
 .img[data-status='placeholder'] {

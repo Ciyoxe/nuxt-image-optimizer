@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { useFetch, useHead, useRuntimeConfig } from '#app';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import type { OImgProps } from './types';
 
 const mediaSizes = useRuntimeConfig().public.cachedImageOptimizerSizes;
@@ -44,14 +44,22 @@ const originalSrcset = computed(() => {
 });
 
 const sizes = computed(() => {
-    const sizes = [];
-    for (const sizeKey in props.sizes) {
-        if (!(mediaSizes as any)[sizeKey]) {
-            throw new Error(`Invalid size key: ${sizeKey}`);
-        }
-        sizes.push(`${(mediaSizes as any)[sizeKey]} ${sizeKey}`);
+    if (typeof props.sizes === 'string') {
+        return props.sizes;
     }
-    if (sizes.length) return sizes.join(', ');
+
+    if (!props.sizes || Object.keys(props.sizes).length === 0) {
+        return undefined;
+    }
+
+    return Object.entries(props.sizes)
+        .map(([key, val]) => {
+            if (!(mediaSizes as any)[key]) {
+                throw new Error(`Invalid size key: ${key}`);
+            }
+            return `${(mediaSizes as any)[key]} ${typeof val === 'number' ? `${val}px` : val}`;
+        })
+        .join(', ');
 });
 
 const alt = computed(() => {
@@ -65,7 +73,7 @@ const role = computed(() => {
     if (props.role) {
         return props.role;
     }
-    return props.alt ? undefined : 'presentation';
+    return props.alt ? 'img' : 'presentation';
 });
 
 const getImageSrc = (width?: number, height?: number, format?: string, quality?: string | number) => {

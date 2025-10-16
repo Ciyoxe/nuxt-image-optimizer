@@ -8,14 +8,16 @@ export default defineNuxtModule<ModuleConfig>({
         configKey: 'cachedImageOptimizer',
     },
     setup(config, nuxt) {
+        const resolver = createResolver(import.meta.url);
+
         const storageOptions = {
             'cached-image-optimizer__local': {
                 driver: 'fs',
-                base: 'public'
+                base: 'public',
             },
             'cached-image-optimizer__cache': {
                 driver: config.cache.storagePath === 'in-memory' ? 'memory' : 'fs',
-                base: config.cache.storagePath === 'in-memory' ? null : '.cache',
+                base: config.cache.storagePath === 'in-memory' ? null : config.cache.storagePath,
             },
         };
 
@@ -31,7 +33,6 @@ export default defineNuxtModule<ModuleConfig>({
             ...storageOptions,
         };
 
-        const resolver = createResolver(import.meta.url);
         addServerPlugin(resolver.resolve('./runtime/server/plugins/service'));
         addServerHandler({
             handler: resolver.resolve('./runtime/server/api/cimgopt.get'),

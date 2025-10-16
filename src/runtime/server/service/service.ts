@@ -99,7 +99,7 @@ export class Service {
     }
 
     private getKey(url: string, settings: ImageSettings) {
-        return `${url}-${settings.format}-${settings.quality}-${settings.width}-${settings.height}`;
+        return `${url.replaceAll(/[:/?#%[\]]/g, '_')}-${settings.quality}-${settings.width}-${settings.height}.${settings.format}`;
     }
 
     private async removeImageFromCache(key: string) {
