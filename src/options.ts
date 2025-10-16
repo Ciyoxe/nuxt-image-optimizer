@@ -53,11 +53,11 @@ export const defaultModuleConfig: Readonly<ModuleConfig> = {
     },
     sizes: {
         xs: '(width < 320px)',
-        sm: '(320px <= width < 640px)',
-        md: '(640px <= width < 768px)',
-        lg: '(768px <= width < 1024px)',
-        xl: '(1024px <= width < 1280px)',
-        xxl: '(width > 1280px)',
+        sm: '(width < 640px)',
+        md: '(width < 768px)',
+        lg: '(width < 1024px)',
+        xl: '(width < 1280px)',
+        xxl: '(width < 1280px)',
     },
     domains: [],
 };

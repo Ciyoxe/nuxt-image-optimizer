@@ -66,41 +66,50 @@ const handleError = () => {
 };
 
 const placeholderSrcset = computed(() => {
-    if (props.placeholder) {
-        return getImageSrc(props.placeholder.width, props.placeholder.height, props.format, props.placeholder.quality ?? props.quality);
+    if (!props.placeholder) {
+        return;
     }
+    const [quality, width, height] = props.placeholder.split(',').map((s) => s.trim());
+    return getImageSrc(width, height, props.format, quality ?? props.quality);
 });
 
 const originalSrcset = computed(() => {
-    if (typeof props.srcset === 'number') {
-        return getImageSrc(props.srcset, undefined, props.format, props.quality);
+    if (!props.srcset) {
+        return getImageSrc(undefined, undefined, props.format, props.quality);
     }
-    if (typeof props.srcset === 'string') {
-        return getImageSrc(Number(props.srcset.replace('px', '')), undefined, props.format, props.quality);
-    }
-    if (Array.isArray(props.srcset)) {
-        return props.srcset.map((width) => `${getImageSrc(width, undefined, props.format, props.quality)} ${width}w`).join(', ');
-    }
-    return getImageSrc(undefined, undefined, props.format, props.quality);
+    return props.srcset
+        .split(',')
+        .map((width) => width.trim())
+        .map((width) => `${getImageSrc(width, undefined, props.format, props.quality)} ${width}w`)
+        .join(', ');
 });
 
 const sizes = computed(() => {
-    if (typeof props.sizes === 'string') {
-        return props.sizes;
+    if (!props.sizes) {
+        return;
+    }
+    const sizesMap = props.sizes.split(',').map((s) => s.trim().split(':').map((s) => s.trim()));
+
+    // move values without keys to end (fallback sizes)
+    for (let i = 0; i < sizesMap.length; i++) {
+        if (!sizesMap[i]![1]) {
+            sizesMap.push(sizesMap.splice(i, 1)[0]!);
+        }
     }
 
-    if (!props.sizes || Object.keys(props.sizes).length === 0) {
-        return undefined;
-    }
+    return sizesMap.map(([key, value]) => {
+        // fallback size
+        if (!value) {
+            return key;
+        }
 
-    return Object.entries(props.sizes)
-        .map(([key, val]) => {
-            if (!(mediaSizes as any)[key]) {
-                throw new Error(`Invalid size key: ${key}`);
-            }
-            return `${(mediaSizes as any)[key]} ${typeof val === 'number' ? `${val}px` : val}`;
-        })
-        .join(', ');
+        // size with media query
+        const mediaQuery = (mediaSizes as any)[key!];
+        if (!mediaQuery) {
+            throw new Error(`Invalid media query key: ${key} in sizes: ${props.sizes}`);
+        }
+        return `${mediaQuery} ${value}`;
+    }).join(', ');
 });
 
 const alt = computed(() => {
@@ -117,59 +126,48 @@ const role = computed(() => {
     return props.alt ? 'img' : 'presentation';
 });
 
-const getImageSrc = (width?: number, height?: number, format?: string, quality?: string | number) => {
+const getImageSrc = (width?: string, height?: string, format?: string, quality?: string) => {
     const params = new URLSearchParams({ url: props.src || '' });
-    if (width) params.append('w', width.toString());
-    if (height) params.append('h', height.toString());
+    if (width) params.append('w', width);
+    if (height) params.append('h', height);
     if (format) params.append('f', format);
-    if (quality) params.append('q', quality.toString());
+    if (quality) params.append('q', quality);
     return `/api/__cimgopt?${params.toString()}`;
 };
 
-const getImageSizesSrc = (width?: number, height?: number, format?: string, quality?: string | number) => {
+const getImageSizesSrc = (width?: string, height?: string, format?: string, quality?: string) => {
     const params = new URLSearchParams({ url: props.src || '' });
-    if (width) params.append('w', width.toString());
-    if (height) params.append('h', height.toString());
+    if (width) params.append('w', width);
+    if (height) params.append('h', height);
     if (format) params.append('f', format);
-    if (quality) params.append('q', quality.toString());
+    if (quality) params.append('q', quality);
     return `/api/__cimgopt-size?${params.toString()}`;
 };
 
 // get any src to retrieve image sizes (i hope, from cache)
-// if there is no placeholder or srcset, use query with url only (highly-likely cache miss and refetch on backend)
+// in rare cases, it may be not cached, so we need to refetch image on backend
+// api endpoint returns original image sizes, so, we don't care about conversion settings
 const getAnySrcForSizes = () => {
-    if (props.placeholder) {
-        return getImageSizesSrc(
-            props.placeholder.width,
-            props.placeholder.height,
-            props.format,
-            props.placeholder.quality ?? props.quality,
-        );
-    }
-    if (typeof props.srcset === 'number') {
-        return getImageSizesSrc(props.srcset, undefined, props.format, props.quality);
-    }
-    if (typeof props.srcset === 'string') {
-        return getImageSizesSrc(Number(props.srcset.replace('px', '')), undefined, props.format, props.quality);
-    }
-    if (Array.isArray(props.srcset) && props.srcset.length) {
-        return getImageSizesSrc(props.srcset[0], undefined, props.format, props.quality);
+    const firstWidth = props.srcset?.split(' ')[0];
+    if (firstWidth) {
+        return getImageSizesSrc(firstWidth, undefined, props.format, props.quality);
     }
     return getImageSizesSrc(undefined, undefined, props.format, props.quality);
 };
 
-// api endpoint returns original image sizes, so, we don't care about conversion settings
 const { data: ssrSize } = await useFetch<{ w: number; h: number }>(getAnySrcForSizes(), {
     key: () => `oimg-ssr-size-${props.src}`,
     watch: [() => props.src],
 });
 
 const style = computed(() => {
-    return {
-        '--original-width': ssrSize.value ? ssrSize.value.w : undefined,
-        '--original-height': ssrSize.value ? ssrSize.value.h : undefined,
-        '--aspect-ratio': ssrSize.value ? ssrSize.value.w / ssrSize.value.h : undefined,
-    };
+    if (ssrSize.value) {
+        return {
+            '--original-width': ssrSize.value.w,
+            '--original-height': ssrSize.value.h,
+            '--aspect-ratio': ssrSize.value.w / ssrSize.value.h,
+        };
+    }
 });
 
 if (props.preload) {
