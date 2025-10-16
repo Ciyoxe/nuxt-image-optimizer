@@ -239,4 +239,16 @@ export class Service {
             h: image.height,
         };
     }
+
+    getDebugInfo() {
+        return {
+            config: this.config,
+            cacheSize: this.cacheSize,
+            cachedItems: this.cacheIndex.size,
+            computedCacheSize: Array.from(this.cacheIndex.values()).reduce((acc, item) => acc + item.dataSize, 0),
+            mainTasksQueue: this.mainTasksQueue.getDebugInfo(),
+            backgroundTasksQueue: this.backgroundTasksQueue.getDebugInfo(),
+            imgFetcher: this.imgFetcher.getDebugInfo(),
+        };
+    }
 }

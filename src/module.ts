@@ -42,6 +42,10 @@ export default defineNuxtModule<ModuleConfig>({
             handler: resolver.resolve('./runtime/server/api/cimgopt-size.get'),
             route: '/api/__cimgopt-size',
         });
+        addServerHandler({
+            handler: resolver.resolve('./runtime/server/api/cimgopt-debug.get'),
+            route: '/api/__cimgopt-debug',
+        });
         addComponent({
             filePath: resolver.resolve('./runtime/components/o-img/index.vue'),
             name: 'o-img',

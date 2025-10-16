@@ -63,4 +63,11 @@ export class ImageFetcher {
     fetchImage(url: string) {
         return this.cacheLock.withKeyLocked(url, () => this.getOrCacheImage(url));
     }
+
+    getDebugInfo() {
+        return {
+            fetchCacheItems: this.fetchCache.size,
+            fetchCacheSize: Array.from(this.fetchCache.values()).reduce((acc, item) => acc + item.data.byteLength, 0),
+        };
+    }
 }

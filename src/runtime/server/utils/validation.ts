@@ -68,6 +68,12 @@ export const validateParams = (params: Record<string, string>) => {
             statusMessage: 'URL is required',
         });
     }
+    if (params.url.length > 2048) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: 'URL is too long',
+        });
+    }
     settings.url = params.url;
     return settings;
 };

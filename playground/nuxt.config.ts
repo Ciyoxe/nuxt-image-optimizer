@@ -5,9 +5,9 @@ export default defineNuxtConfig({
 
     cachedImageOptimizer: {
         cache: {
-            maxSize: '20MB',
+            maxSize: '300KB',
             queueSize: 1000,
-            queueTimeout: '5s',
+            queueTimeout: '0s',
             storagePath: '.cache/oimgs',
         }
     },

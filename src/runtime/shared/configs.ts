@@ -4,14 +4,14 @@ export type Time = `${number}${'s' | 'm' | 'h' | 'd'}`;
 export const getSizeInBytes = (size: string) => {
     const trimmedSize = size.trim();
     switch (true) {
-        case trimmedSize.endsWith('B'):
-            return Number(trimmedSize.slice(0, -1));
-        case trimmedSize.endsWith('KB'):
-            return Number(trimmedSize.slice(0, -2)) * 1024;
-        case trimmedSize.endsWith('MB'):
-            return Number(trimmedSize.slice(0, -2)) * 1024 * 1024;
         case trimmedSize.endsWith('GB'):
             return Number(trimmedSize.slice(0, -2)) * 1024 * 1024 * 1024;
+        case trimmedSize.endsWith('MB'):
+            return Number(trimmedSize.slice(0, -2)) * 1024 * 1024;
+        case trimmedSize.endsWith('KB'):
+            return Number(trimmedSize.slice(0, -2)) * 1024;
+        case trimmedSize.endsWith('B'):
+            return Number(trimmedSize.slice(0, -1));
         default:
             throw new Error(`Invalid size: ${size}, it should end with B | KB | MB | GB`);
     }

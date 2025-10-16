@@ -3,11 +3,16 @@
 
     <p>Nuxt module playground!</p>
     <OImg
+        v-for="image in images"
+        :key="image"
         class="img"
-        src="https://placehold.co/3000x2000/png"
+        :src="image"
+        format="jpeg"
+        quality="100"
         sizes="100vw"
         srcset="400, 500, 600, 1000"
-        placeholder="40, 70, 80"
+        loading="lazy"
+        placeholder="40, 70, 80, 90, 100"
     />
 </template>
 

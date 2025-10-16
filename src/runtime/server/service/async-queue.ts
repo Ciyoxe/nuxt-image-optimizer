@@ -87,4 +87,13 @@ export class AsyncQueue {
     length() {
         return this.queue.length + (this.workingOn ? 1 : 0);
     }
+
+    getDebugInfo() {
+        return {
+            queueLength: this.queue.length,
+            workingOn: this.workingOn,
+            waitingOn: this.waitingOn,
+            running: this.running,
+        };
+    }
 }
