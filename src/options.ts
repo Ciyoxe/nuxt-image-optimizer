@@ -1,4 +1,4 @@
-import type { Size, Time } from "./runtime/shared/configs";
+import type { Size, Time } from './runtime/shared/configs';
 
 type ScreenSizeOptions = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | (string & {});
 type FormatOptions = 'webp' | 'avif' | 'jpeg' | 'png';

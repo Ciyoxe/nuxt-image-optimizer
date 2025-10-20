@@ -1,23 +1,25 @@
 <template>
-    <NuxtLink to="/foo">Foo</NuxtLink>
+    <div>
+        <NuxtLink to="/foo">Foo</NuxtLink>
 
-    <p>Nuxt module playground!</p>
-    <OImg
-        v-for="image in images"
-        :key="image"
-        class="img"
-        :src="image"
-        format="jpeg"
-        quality="100"
-        sizes="100vw"
-        srcset="400, 500, 600, 1000"
-        loading="lazy"
-        placeholder="40, 70, 80, 90, 100"
-    />
+        <p>Nuxt module playground!</p>
+        <OImg
+            v-for="image in images"
+            :key="image"
+            class="img"
+            :src="image"
+            format="jpeg"
+            quality="100"
+            sizes="100vw"
+            srcset="400, 500, 600, 1000"
+            loading="lazy"
+            placeholder="40, 70, 80, 90, 100"
+        />
+    </div>
 </template>
 
 <script setup lang="ts">
-const images = new Array(20).fill(0).map((_, index) => `https://placehold.co/${3000 + index}x2000/png`);
+const images = Array.from({ length: 20 }, (_, index) => `https://placehold.co/${3000 + index}x2000/png`);
 </script>
 
 <style scoped lang="css">

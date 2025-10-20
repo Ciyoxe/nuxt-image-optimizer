@@ -11,10 +11,10 @@
         :role
         :data-oimg-srcset="originalSrcset"
         :data-oimg-placeholder="placeholderSrcset"
-        @load="handleLoad"
-        @error="handleError"
         onload="this.srcset===this.dataset.oimgPlaceholder?(this.dataset.status='placeholder',this.srcset=this.dataset.oimgSrcset):this.dataset.status='completed'"
         onerror="this.srcset===this.dataset.oimgPlaceholder?this.srcset=this.dataset.oimgSrcset:this.dataset.status='error'"
+        @load="handleLoad"
+        @error="handleError"
     />
 </template>
 
@@ -104,7 +104,12 @@ const sizes = computed(() => {
     if (!props.sizes) {
         return;
     }
-    const sizesMap = props.sizes.split(',').map((s) => s.trim().split(':').map((s) => s.trim()));
+    const sizesMap = props.sizes.split(',').map((s) =>
+        s
+            .trim()
+            .split(':')
+            .map((s) => s.trim()),
+    );
 
     // move values without keys to end (fallback sizes)
     for (let i = 0; i < sizesMap.length; i++) {
@@ -113,19 +118,21 @@ const sizes = computed(() => {
         }
     }
 
-    return sizesMap.map(([key, value]) => {
-        // fallback size
-        if (!value) {
-            return key;
-        }
+    return sizesMap
+        .map(([key, value]) => {
+            // fallback size
+            if (!value) {
+                return key;
+            }
 
-        // size with media query
-        const mediaQuery = (mediaSizes as any)[key!];
-        if (!mediaQuery) {
-            throw new Error(`Invalid media query key: ${key} in sizes: ${props.sizes}`);
-        }
-        return `${mediaQuery} ${value}`;
-    }).join(', ');
+            // size with media query
+            const mediaQuery = (mediaSizes as any)[key!];
+            if (!mediaQuery) {
+                throw new Error(`Invalid media query key: ${key} in sizes: ${props.sizes}`);
+            }
+            return `${mediaQuery} ${value}`;
+        })
+        .join(', ');
 });
 
 const alt = computed(() => {
@@ -155,12 +162,15 @@ const getImageSizesSrc = () => {
     return `/api/__cimgopt-size?url=${props.src}`;
 };
 
-const { data: ssrSize } = await useAsyncData(() => `oimg-ssr-size-${props.src}`, async () => {
-    if (!domainAllowed.value) {
-        return;
-    }
-    return await $fetch<{ w: number; h: number }>(getImageSizesSrc());
-});
+const { data: ssrSize } = await useAsyncData(
+    () => `oimg-ssr-size-${props.src}`,
+    async () => {
+        if (!domainAllowed.value) {
+            return;
+        }
+        return await $fetch<{ w: number; h: number }>(getImageSizesSrc());
+    },
+);
 
 const style = computed(() => {
     if (ssrSize.value) {
@@ -170,6 +180,7 @@ const style = computed(() => {
             '--aspect-ratio': ssrSize.value.w / ssrSize.value.h,
         };
     }
+    return undefined;
 });
 
 if (props.preload) {

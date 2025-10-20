@@ -11,7 +11,8 @@ export type ImageSettings = {
 
 export class ImageOptimizer {
     async optimizeImage(image: ImageData, settings: ImageSettings, cpuEffort: number) {
-        let { width, height, data } = image;
+        let { width, height } = image;
+        const data = image.data;
 
         const scale = Math.min(settings.width / width, settings.height / height);
         if (scale < 1) {

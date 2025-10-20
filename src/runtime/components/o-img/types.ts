@@ -1,5 +1,3 @@
-
-
 export type OImgProps = {
     src?: string;
     alt?: string;

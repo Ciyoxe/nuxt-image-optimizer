@@ -127,7 +127,7 @@ export class Service {
         let worstKey = '';
 
         for (const [k, v] of this.cacheIndex.entries()) {
-            if (v.agingCounter <= worstAging) {
+            if (v.agingCounter < worstAging) {
                 worstAging = v.agingCounter;
                 worstKey = k;
             }

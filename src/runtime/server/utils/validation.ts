@@ -33,8 +33,8 @@ export const validateParams = (params: Record<string, string>) => {
             });
     }
     if (params.q) {
-        const quality = parseInt(params.q);
-        if (isNaN(quality) || quality < 1 || quality > 100) {
+        const quality = Number.parseInt(params.q);
+        if (Number.isNaN(quality) || quality < 1 || quality > 100) {
             throw createError({
                 statusCode: 400,
                 statusMessage: `Invalid quality: ${quality}`,
@@ -43,8 +43,8 @@ export const validateParams = (params: Record<string, string>) => {
         settings.quality = quality;
     }
     if (params.w) {
-        const width = parseInt(params.w);
-        if (isNaN(width) || width < 1 || width > 16384) {
+        const width = Number.parseInt(params.w);
+        if (Number.isNaN(width) || width < 1 || width > 16384) {
             throw createError({
                 statusCode: 400,
                 statusMessage: `Invalid width: ${width}`,
@@ -53,8 +53,8 @@ export const validateParams = (params: Record<string, string>) => {
         settings.width = width;
     }
     if (params.h) {
-        const height = parseInt(params.h);
-        if (isNaN(height) || height < 1 || height > 16384) {
+        const height = Number.parseInt(params.h);
+        if (Number.isNaN(height) || height < 1 || height > 16384) {
             throw createError({
                 statusCode: 400,
                 statusMessage: `Invalid height: ${height}`,

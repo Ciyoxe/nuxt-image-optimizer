@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { useStorage } from 'nitropack/runtime';
 import { CacheLock } from './cache-lock';
 
