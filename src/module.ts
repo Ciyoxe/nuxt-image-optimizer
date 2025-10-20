@@ -22,6 +22,7 @@ export default defineNuxtModule<ModuleConfig>({
         };
 
         nuxt.options.runtimeConfig.public.cachedImageOptimizerSizes = config.sizes;
+        nuxt.options.runtimeConfig.public.cachedImageOptimizerDomains = config.domains;
         nuxt.options.runtimeConfig.cachedImageOptimizer = config;
         nuxt.options.nitro ||= {};
         nuxt.options.nitro.storage = {

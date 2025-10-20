@@ -16,6 +16,7 @@ type Cache = {
     storagePath: 'in-memory' | (string & {});
     queueSize: number;
     queueTimeout: Time;
+    sizeCacheMaxCount: number;
 };
 
 type AutoRefresh = {
@@ -38,6 +39,7 @@ export const defaultModuleConfig: Readonly<ModuleConfig> = {
         queueTimeout: '5s',
         storagePath: 'in-memory',
         maxSize: '20MB',
+        sizeCacheMaxCount: 10000,
     },
     autoRefresh: {
         maxAge: '30m',
@@ -46,7 +48,7 @@ export const defaultModuleConfig: Readonly<ModuleConfig> = {
     },
     conversion: {
         format: 'webp',
-        quality: 80,
+        quality: 75,
         width: 4096,
         height: 4096,
         cpuEffort: 6,

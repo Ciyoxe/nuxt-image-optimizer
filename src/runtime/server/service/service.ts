@@ -12,6 +12,7 @@ type Config = {
     backgroundQueueSize: number;
     backgroundQueueTimeout: number;
     cpuEffort: number;
+    sizeCacheMaxCount: number;
 };
 
 type CacheIndexItem = {
@@ -42,6 +43,9 @@ export class Service {
     private cacheDataStorage = useStorage<Buffer>('cached-image-optimizer__cache');
     private cacheIndex = new Map<string, CacheIndexItem>();
     private cacheSize = 0;
+
+    // cache for image sizes, key is url
+    private sizeCache = new Map<string, [number, number]>();
 
     private imgFetcher = new ImageFetcher();
     private imgOptimizer = new ImageOptimizer();
@@ -81,6 +85,9 @@ export class Service {
             if (time - v.lastUpdated > this.config.autoRefreshInterval && !this.backgroundTasksQueue.hasTaskInQueue(k)) {
                 this.backgroundTasksQueue.add(k, async () => {
                     const image = await this.imgFetcher.fetchImage(v.original.url);
+
+                    this.setSizeCache(v.original.url, image);
+
                     if (v.original.hash !== image.hash) {
                         const optimized = await this.imgOptimizer.optimizeImage(image, v.settings, this.config.cpuEffort);
                         await this.lock.withKeyLocked(k, () => this.updateImageInCache(k, image, optimized.data));
@@ -199,6 +206,14 @@ export class Service {
         }
     }
 
+    private setSizeCache(url: string, image: ImageData) {
+        this.sizeCache.set(url, [image.width, image.height]);
+
+        if (this.sizeCache.size >= this.config.sizeCacheMaxCount) {
+            this.sizeCache.delete(this.sizeCache.keys().next().value!);
+        }
+    }
+
     async getImage(url: string, settings: ImageSettings) {
         const key = this.getKey(url, settings);
 
@@ -211,29 +226,31 @@ export class Service {
         if (!this.mainTasksQueue.hasTaskInQueue(key)) {
             this.mainTasksQueue.add(key, async () => {
                 const image = await this.imgFetcher.fetchImage(url);
+
+                this.setSizeCache(url, image);
+
                 const optimized = await this.imgOptimizer.optimizeImage(image, settings, this.config.cpuEffort);
                 await this.lock.withKeyLocked(key, () => this.addImageToCache(key, settings, image, optimized.data));
             });
         }
 
         // return original image if its not converted yet
-        return (await this.imgFetcher.fetchImage(url)).data;
+        const originalImage = await this.imgFetcher.fetchImage(url);
+        this.setSizeCache(url, originalImage);
+        return originalImage.data;
     }
 
-    // this method required settings to not making additional sizes cache
-    // in most cases, sizes will be retrieved from cache
-    async getImageSize(url: string, settings: ImageSettings) {
-        const key = this.getKey(url, settings);
-
-        const cachedIndex = this.cacheIndex.get(key);
-        if (cachedIndex) {
+    async getImageSize(url: string) {
+        const size = this.sizeCache.get(url);
+        if (size) {
             return {
-                w: cachedIndex.original.width,
-                h: cachedIndex.original.height,
+                w: size[0],
+                h: size[1],
             };
         }
 
         const image = await this.imgFetcher.fetchImage(url);
+        this.setSizeCache(url, image);
         return {
             w: image.width,
             h: image.height,
@@ -244,6 +261,7 @@ export class Service {
         return {
             config: this.config,
             cacheSize: this.cacheSize,
+            sizeCacheCount: this.sizeCache.size,
             cachedItems: this.cacheIndex.size,
             computedCacheSize: Array.from(this.cacheIndex.values()).reduce((acc, item) => acc + item.dataSize, 0),
             mainTasksQueue: this.mainTasksQueue.getDebugInfo(),

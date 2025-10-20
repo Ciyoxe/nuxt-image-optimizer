@@ -9,6 +9,7 @@ export default defineNuxtConfig({
             queueSize: 1000,
             queueTimeout: '0s',
             storagePath: '.cache/oimgs',
+            sizeCacheMaxCount: 10000,
         }
     },
 });

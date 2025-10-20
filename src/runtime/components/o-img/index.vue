@@ -23,7 +23,10 @@ import { useFetch, useHead, useRuntimeConfig } from '#app';
 import { ref, computed, onMounted } from 'vue';
 import type { OImgProps } from './types';
 
-const mediaSizes = useRuntimeConfig().public.cachedImageOptimizerSizes;
+const config = useRuntimeConfig().public;
+const mediaSizes = config.cachedImageOptimizerSizes;
+const domains = config.cachedImageOptimizerDomains;
+
 const props = defineProps<OImgProps>();
 const emit = defineEmits(['load', 'load:placeholder', 'error']);
 
@@ -65,8 +68,18 @@ const handleError = () => {
     }
 };
 
+const domainAllowed = computed(() => {
+    if (!props.src) {
+        return false;
+    }
+    if (props.src.startsWith('/')) {
+        return true;
+    }
+    return domains.includes(new URL(props.src).hostname);
+});
+
 const placeholderSrcset = computed(() => {
-    if (!props.placeholder) {
+    if (!props.placeholder || !domainAllowed.value) {
         return;
     }
     const [quality, width, height] = props.placeholder.split(',').map((s) => s.trim());
@@ -74,6 +87,9 @@ const placeholderSrcset = computed(() => {
 });
 
 const originalSrcset = computed(() => {
+    if (!domainAllowed.value) {
+        return props.src;
+    }
     if (!props.srcset) {
         return getImageSrc(undefined, undefined, props.format, props.quality);
     }
@@ -135,27 +151,11 @@ const getImageSrc = (width?: string, height?: string, format?: string, quality?:
     return `/api/__cimgopt?${params.toString()}`;
 };
 
-const getImageSizesSrc = (width?: string, height?: string, format?: string, quality?: string) => {
-    const params = new URLSearchParams({ url: props.src || '' });
-    if (width) params.append('w', width);
-    if (height) params.append('h', height);
-    if (format) params.append('f', format);
-    if (quality) params.append('q', quality);
-    return `/api/__cimgopt-size?${params.toString()}`;
+const getImageSizesSrc = () => {
+    return `/api/__cimgopt-size?url=${props.src}`;
 };
 
-// get any src to retrieve image sizes (i hope, from cache)
-// in rare cases, it may be not cached, so we need to refetch image on backend
-// api endpoint returns original image sizes, so, we don't care about conversion settings
-const getAnySrcForSizes = () => {
-    const firstWidth = props.srcset?.split(' ')[0];
-    if (firstWidth) {
-        return getImageSizesSrc(firstWidth, undefined, props.format, props.quality);
-    }
-    return getImageSizesSrc(undefined, undefined, props.format, props.quality);
-};
-
-const { data: ssrSize } = await useFetch<{ w: number; h: number }>(getAnySrcForSizes(), {
+const { data: ssrSize } = await useFetch<{ w: number; h: number }>(getImageSizesSrc(), {
     key: () => `oimg-ssr-size-${props.src}`,
     watch: [() => props.src],
 });

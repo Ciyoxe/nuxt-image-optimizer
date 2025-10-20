@@ -1,8 +1,8 @@
 {
-    "name": "cached-image-optimizer",
-    "version": "1.0.0",
-    "description": "My new Nuxt module",
-    "repository": "your-org/my-module",
+    "name": "nuxt-image-optimizer",
+    "version": "0.0.1",
+    "description": "Nuxt module for on‑demand image optimization with caching, responsive srcset/sizes, and CLS‑safe placeholders",
+    "repository": "github:ciyoxe/nuxt-image-optimizer",
     "license": "MIT",
     "type": "module",
     "exports": {
