@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { useFetch, useHead, useRuntimeConfig } from '#app';
+import { useAsyncData, useHead, useRuntimeConfig } from '#app';
 import { ref, computed, onMounted } from 'vue';
 import type { OImgProps } from './types';
 
@@ -155,9 +155,11 @@ const getImageSizesSrc = () => {
     return `/api/__cimgopt-size?url=${props.src}`;
 };
 
-const { data: ssrSize } = await useFetch<{ w: number; h: number }>(getImageSizesSrc(), {
-    key: () => `oimg-ssr-size-${props.src}`,
-    watch: [() => props.src],
+const { data: ssrSize } = await useAsyncData(() => `oimg-ssr-size-${props.src}`, async () => {
+    if (!domainAllowed.value) {
+        return;
+    }
+    return await $fetch<{ w: number; h: number }>(getImageSizesSrc());
 });
 
 const style = computed(() => {

@@ -10,6 +10,7 @@ export default defineNuxtConfig({
             queueTimeout: '0s',
             storagePath: '.cache/oimgs',
             sizeCacheMaxCount: 10000,
-        }
+        },
+        domains: ['placehold.co'],
     },
 });
