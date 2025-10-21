@@ -74,6 +74,12 @@ export const validateParams = (params: Record<string, string>) => {
             statusMessage: 'URL is too long',
         });
     }
+    if (!config.domains.includes(new URL(params.url).hostname)) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: 'URL is not allowed',
+        });
+    }
     settings.url = params.url;
     return settings;
 };

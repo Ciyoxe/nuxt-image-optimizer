@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const settings = validateParams(getQuery(event));
-    const size = await service.getImageSize(settings.url, settings);
+    const size = await service.getImageSize(settings.url);
 
     setHeaders(event, {
         'Cache-Control': `public, max-age=${Math.round(getTimeInMilliseconds(config.autoRefresh.maxAge) / 1000)}`,
