@@ -1,6 +1,6 @@
 {
     "name": "nuxt-image-optimizer",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Nuxt module for on-demand image optimization with caching, responsive srcset/sizes, and CLS-safe placeholders",
     "repository": "github:ciyoxe/nuxt-image-optimizer",
     "homepage": "https://github.com/ciyoxe/nuxt-image-optimizer#readme",
