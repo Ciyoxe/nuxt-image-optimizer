@@ -166,14 +166,14 @@ const { data: ssrSize } = await useAsyncData(
     () => `oimg-ssr-size-${props.src}`,
     async () => {
         if (!domainAllowed.value) {
-            return;
+            return { w: 0, h: 0 };
         }
         return await $fetch<{ w: number; h: number }>(getImageSizesSrc());
     },
 );
 
 const style = computed(() => {
-    if (ssrSize.value) {
+    if (ssrSize.value?.w && ssrSize.value?.h) {
         return {
             '--original-width': ssrSize.value.w,
             '--original-height': ssrSize.value.h,

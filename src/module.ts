@@ -21,6 +21,9 @@ export default defineNuxtModule<ModuleConfig>({
             },
         };
 
+        // transform domains to not contain urls
+        config.domains = config.domains.map((url) => new URL(url).hostname);
+
         nuxt.options.runtimeConfig.public.cachedImageOptimizerSizes = config.sizes;
         nuxt.options.runtimeConfig.public.cachedImageOptimizerDomains = config.domains;
         nuxt.options.runtimeConfig.cachedImageOptimizer = config;
