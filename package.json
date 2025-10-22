@@ -3,6 +3,34 @@
     "version": "0.0.3",
     "description": "Nuxt module for on-demand image optimization with caching, responsive srcset/sizes, and CLS-safe placeholders",
     "repository": "github:ciyoxe/nuxt-image-optimizer",
+    "homepage": "https://github.com/ciyoxe/nuxt-image-optimizer#readme",
+    "bugs": {
+        "url": "https://github.com/ciyoxe/nuxt-image-optimizer/issues"
+    },
+    "author": "ciyoxe <ciyoxe@gmail.com>",
+    "keywords": [
+        "nuxt",
+        "nuxt-module",
+        "nuxt3",
+        "nuxt4",
+        "nitro",
+        "image",
+        "images",
+        "image-optimizer",
+        "image-optimization",
+        "sharp",
+        "webp",
+        "avif",
+        "jpeg",
+        "png",
+        "responsive",
+        "srcset",
+        "sizes",
+        "placeholder",
+        "cls",
+        "performance",
+        "caching"
+    ],
     "license": "MIT",
     "type": "module",
     "exports": {
@@ -33,7 +61,6 @@
     },
     "dependencies": {
         "@nuxt/kit": "^4.1.3",
-        "eslint-config-prettier": "^10.1.8",
         "sharp": "^0.34.4"
     },
     "devDependencies": {
@@ -48,6 +75,7 @@
         "nuxt": "^4.1.3",
         "prettier": "^3.6.2",
         "typescript": "~5.9.3",
+        "eslint-config-prettier": "^10.1.8",
         "vue-tsc": "^3.1.0"
     }
 }

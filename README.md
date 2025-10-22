@@ -5,7 +5,7 @@
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 
-On‑demand image optimization for Nuxt. Serves responsive, cached images with CLS‑safe placeholders via a simple `<o-img>` component and HTTP endpoints powered by Sharp.
+On‑demand image optimization module for Nuxt. Serves responsive, cached images with CLS‑safe placeholders via a simple `<o-img>` component and HTTP endpoints powered by Sharp.
 
 ## Features
 
@@ -131,6 +131,7 @@ Some behaviour diffs from default image component:
     cpuEffort: 6,
   },
   // media queries list to use in 'sizes' prop
+  // you can define your own keys, like '2xl'
   sizes: {
     xs: '(width < 320px)',
     sm: '(width < 640px)',
