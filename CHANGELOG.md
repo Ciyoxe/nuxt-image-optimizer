@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.5
+Fixed local urls error
+[compare changes](https://github.com/ciyoxe/nuxt-image-optimizer/compare/v0.0.4...v0.0.5)
+
 ## v0.0.4
 Fixed dependencies issue.
 
