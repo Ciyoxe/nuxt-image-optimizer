@@ -91,6 +91,8 @@ export class Service {
                     if (v.original.hash !== image.hash) {
                         const optimized = await this.imgOptimizer.optimizeImage(image, v.settings, this.config.cpuEffort);
                         await this.lock.withKeyLocked(k, () => this.updateImageInCache(k, image, optimized.data));
+                    } else {
+                        v.lastUpdated = Date.now();
                     }
                 });
             }
